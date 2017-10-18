@@ -14,7 +14,13 @@ module.exports = (db, name) => {
     db.set(name, req.body).value()
     res.locals.data = db.get(name).value()
 
-    res.setHeader('Access-Control-Expose-Headers', 'Location')
+    if (res._headers && res._headers['access-control-expose-headers']) {
+      const headers = res._headers['access-control-expose-headers']
+        .replace("'", '')
+        .split(',')
+      headers.push('Location')
+      res.setHeader('Access-Control-Expose-Headers', headers.join(','))
+    }
     res.location(`${getFullURL(req)}`)
 
     res.status(201)
